@@ -1,10 +1,6 @@
-import 'dart:math' as math;
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:youth_bridge/screen/authorization/sign_in.dart';
-import 'package:youth_bridge/screen/homepage/home_page.dart';
 import 'package:youth_bridge/widgets/themes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 class SplashPage extends StatefulWidget {
@@ -16,147 +12,141 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
   int _currentPageIndex = 0;
-   late AnimationController _controller;  
-  late Animation<double> _progressAnimation;  
-  Color backgroundColor = AppColors.secondaryColor;
-  String titleText = 'Youth Bridge';
-  String descriptionText =
-      'This is a platform where you will find opportunities for your development in any direction';
-
- void initState() {
-  super.initState();
-  _controller = AnimationController(
-    duration: const Duration(milliseconds: 300), 
-    vsync: this,
-  )..addListener(() {
-    setState(() {}); 
-  });
-
-  _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-    parent: _controller,
-    curve: Curves.easeInOut,
-  ));
-
-  _checkLoginStatus();
-}
+  
+  final PageController _pageController = PageController(initialPage: 0);
 
 
-  Future<void> _checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false; 
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    }
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
-  void _nextPage() {
-    if (_currentPageIndex < 2) { 
-      setState(() {
-        _currentPageIndex++;
-        _controller.animateTo((_currentPageIndex + 1) / 3); 
-        if (_currentPageIndex == 1) {
-          titleText = 'Our Mission';
-          descriptionText = 'Our mission is to empower youth by providing opportunities for personal and professional growth, fostering leadership skills, and creating a platform for meaningful connections and collaborations.'; 
-        } else if (_currentPageIndex == 2) {
-          titleText = 'Start today!';
-          descriptionText = 'Discover a world of opportunities with Youth Bridge. From career growth to personal development, our platform offers the tools and resources you need to succeed. Join us and unlock your potential today!';
-        }
-      });
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SignIn()),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: backgroundColor,
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/img/splash1.png', width: MediaQuery.of(context).size.width * 0.7,),
-            const SizedBox(height: 20),
-            Text(
-              titleText,
-              style: const TextStyle(fontSize: 24, color: Colors.white),
-              textAlign: TextAlign.center,
+      backgroundColor: AppColors.secondaryColor,
+      body: Stack(
+        children: <Widget>[
+          PageView(
+            controller: _pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPageIndex = page;
+              });
+            },
+            children: <Widget>[
+              _buildContent('assets/img/splash1.png', 'Youth Bridge',
+                  'This is a platform where you will find opportunities for your development in any direction'),
+              _buildContent('assets/img/splash1.png', 'Our Mission',
+                  'Our mission is to empower youth by providing opportunities for personal and professional growth, fostering leadership skills, and creating a platform for meaningful connections and collaborations.'),
+              _buildContent('assets/img/splash1.png', 'Start today!',
+                  'Discover a world of opportunities with Youth Bridge. From career growth to personal development, our platform offers the tools and resources you need to succeed. Join us and unlock your potential today!'),
+            ],
+          ),
+          Positioned(
+            bottom: 45,
+            left: 30,
+            child: Row(
+              children: List.generate(3, (index) => _buildDot(index)),
             ),
-            const SizedBox(height: 20),
-            Text(
-              descriptionText, 
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            Container(
-              width: MediaQuery.of(context).size.width * 0.9,
-              height: 5,
-              child: CustomPaint(
-                painter: WaveProgressPainter(
-                  waveAnimation: _controller.value,
-                  progress: _progressAnimation.value,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _currentPageIndex < 2 ? _nextPage : () {},
-              child: const Text('next', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(MediaQuery.of(context).size.width * 1.0, 50), 
-                backgroundColor: AppColors.primaryColor,
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+          ),
+          Positioned(
+            bottom: 30,
+            right: 30,
+            child: _currentPageIndex != 2
+                ? InkWell(
+                    onTap: () {
+                      _pageController.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeIn);
+                    },
+                    child: Container(
+                      height: 38,
+                      width: 150,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color.fromARGB(255, 255, 255, 255), width: 3),
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  )
+                : InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignIn()),
+                      );
+                    },
+                    child: Container(
+                      height: 38,
+                      width: 150,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.secondaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color.fromARGB(255, 255, 255, 255), width: 3,),
+                      ),
+                      child: const Text(
+                        'Start',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(String imagePath, String title, String text) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center, 
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: Image.asset(imagePath, fit: BoxFit.contain),
+          ),
         ),
+        Text(
+          title,
+          style:
+            const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            textAlign: TextAlign.center,),
+        Text(
+          text,
+          style: 
+            const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+            textAlign: TextAlign.center,),
+      ],
+    );
+  }
+
+  Widget _buildDot(int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      height: 15,
+      width: _currentPageIndex == index ? 40 : 12,
+      decoration: BoxDecoration(
+        color: _currentPageIndex == index ? const Color.fromARGB(255, 255, 255, 255) : Colors.grey,
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
 }
 
-class WaveProgressPainter  extends CustomPainter {
-  final double waveAnimation, progress;
-  final Color color;
 
-  WaveProgressPainter({required this.waveAnimation, required this.progress, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    Path path = Path();
-    double waveLength = size.width / 2;
-    double waveHeight = 10;
-
-    path.moveTo(0, size.height);
-    path.lineTo(0, size.height * (1 - progress));
-
-    for (double i = 0; i < size.width; i++) {
-      path.lineTo(i, size.height * (1 - progress) + sin((i / waveLength * 2 * math.pi) + waveAnimation) * waveHeight);
-    }
-
-    path.lineTo(size.width, size.height);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(WaveProgressPainter oldDelegate) {
-    return oldDelegate.waveAnimation != waveAnimation || oldDelegate.progress != progress;
-  }
-}
