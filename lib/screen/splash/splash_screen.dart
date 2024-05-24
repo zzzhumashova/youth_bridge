@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youth_bridge/screen/authorization/sign_in.dart';
 import 'package:youth_bridge/widgets/themes.dart';
-
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -12,16 +10,13 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
   int _currentPageIndex = 0;
-  
   final PageController _pageController = PageController(initialPage: 0);
-
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +77,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                   )
                 : InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignIn()),
-                      );
+                      Navigator.pushNamed(context, '/sign_in');
                     },
                     child: Container(
                       height: 38,
@@ -148,5 +140,3 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     );
   }
 }
-
-
