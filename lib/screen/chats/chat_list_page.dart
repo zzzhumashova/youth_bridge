@@ -1,35 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:youth_bridge/screen/chats/chat_page.dart';
+import 'package:provider/provider.dart';
+import 'package:youth_bridge/screen/chats/chat_list.dart';
+import 'package:youth_bridge/screen/chats/create_forum.dart';
+import 'package:youth_bridge/screen/chats/forum_list.dart';
 import 'package:youth_bridge/widgets/themes.dart';
+import 'package:youth_bridge/widgets/users_provider.dart';
 
-class ChatListPage extends StatelessWidget {
+class ChatListPage extends StatefulWidget {
+  @override
+  _ChatListPageState createState() => _ChatListPageState();
+}
+
+class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
+    String userRole = Provider.of<UserProvider>(context).name;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text('Chats'),
+        title: Text('Chats', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.backgroundColor,
+        automaticallyImplyLeading: false,
+        actions: [
+          if (userRole == 'organization')
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateForumPage(),
+                  ),
+                );
+              },
+            ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicator: UnderlineTabIndicator(
+            borderSide: BorderSide(color: Colors.black, width: 2.0), 
+          ),
+          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: Colors.black54),
+          tabs: [
+            Tab(text: 'Personal'),
+            Tab(text: 'Forum'),
+          ],
+        ),
       ),
-      body: ListView(
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          ListTile(
-            title: Text('Personal Chat 1'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatPage(chatName: 'Personal Chat 1')),
-              );
-            },
-          ),
-          ListTile(
-            title: Text('Forum Chat 1'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatPage(chatName: 'Forum Chat 1')),
-              );
-            },
-          ),
+          PersonalChat(),
+          ForumChat(),
         ],
       ),
     );

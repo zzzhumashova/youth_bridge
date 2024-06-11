@@ -26,11 +26,17 @@ class _SignInState extends State<SignIn> {
 
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
+      String errorMessage;
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        errorMessage = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+        errorMessage = 'Wrong password provided for that user.';
+      } else {
+        errorMessage = 'Failed to sign in: $e';
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
     } catch (e) {
       print('Error during sign in: $e');
     }
@@ -48,14 +54,14 @@ class _SignInState extends State<SignIn> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Image.asset(
-                  'assets/img/splash1.png',
+                  'assets/img/logo_white.png',
                   height: 100,
                   width: 100,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 const Text(
                   'Sign In',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 50),
                 TextField(
@@ -65,17 +71,17 @@ class _SignInState extends State<SignIn> {
                     hintText: 'Enter e-mail',
                     hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide(color: Colors.white),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide(color: Colors.white),
                     ),
                     focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.primaryColor),
-                  ),
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.primaryColor),
+                    ),
                     fillColor: Colors.transparent,
                   ),
                   style: TextStyle(color: Colors.white),
@@ -88,15 +94,15 @@ class _SignInState extends State<SignIn> {
                     hintText: 'Password',
                     hintStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide(color: Colors.white),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide(color: Colors.white),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide(color: AppColors.primaryColor),
                     ),
                     fillColor: Colors.transparent,
@@ -116,13 +122,13 @@ class _SignInState extends State<SignIn> {
                   obscureText: _obscurePassword,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end, 
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/forgot_password_page');
                       },
-                      child: Text('Forgot Password?', style: TextStyle(color: Colors.white),),
+                      child: Text('Forgot Password?', style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),
@@ -144,7 +150,7 @@ class _SignInState extends State<SignIn> {
                   },
                   child: const Text(
                     "Don't have an account? Sign Up",
-                    style: TextStyle(color: Colors.white,),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ],

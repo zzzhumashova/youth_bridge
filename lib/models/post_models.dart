@@ -1,25 +1,24 @@
-class PostsModel {
-  final String username;
-  final String city;
-  final String avatarUrl;
-  final String? photoUrl;
-  final String description;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  PostsModel({
-    required this.username,
-    required this.city,
-    required this.avatarUrl,
-    this.photoUrl,
+class PostModel {
+  final String authorId;
+  final List<String> mediaUrls;
+  final String description;
+  final Timestamp timestamp;
+
+  PostModel({
+    required this.authorId,
+    required this.mediaUrls,
     required this.description,
+    required this.timestamp,
   });
 
-  factory PostsModel.fromFirestore(Map<String, dynamic> firestore) {
-    return PostsModel(
-      username: firestore['username'],
-      city: firestore['city'],
-      avatarUrl: firestore['avatarUrl'],
-      photoUrl: firestore['photoUrl'],
-      description: firestore['description'],
+  factory PostModel.fromDocument(DocumentSnapshot doc) {
+    return PostModel(
+      authorId: doc['authorId'],
+      mediaUrls: List<String>.from(doc['mediaUrls']),
+      description: doc['description'],
+      timestamp: doc['timestamp'],
     );
   }
 }
